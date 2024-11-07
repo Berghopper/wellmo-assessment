@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8" />
+    <title>Coding exercise - Casper van Mourik</title>
+    <script src="exercise_files/d3.v4.min.js"></script>
+    <script
+      src="exercise_files/page-script.js"
+      id="bw-fido2-page-script"
+    ></script>
+    <style>
+      .chart div {
+        font: 10px sans-serif;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        margin: 1px;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Averages graph:</p>
+    <div class="chart">
+      <!-- <div style="width: 20px">0</div>
+      <div style="width: 22px">0</div>
+      <div style="width: 23px">0</div>
+      <div style="width: 24px">0</div>
+      <div style="width: 25px">0</div> -->
+    </div>
+
+    <script>
+      /*
+       * Complete the code in this file to solve the tasks below:
+       *
+       * 0. Check that this file is about 50 lines long at the beginning and
+       *    save this file with a new name coding-task-<your name>.html to provide
+       *    your answer.
+       *
+       * 1. Load data from https://webbi.mhealth.fi/data/data.json
+       *    Prefer the new JavaScript fetch() API
+       *    https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+       *
+       * 2. Plot the fetched data using d3 library.
+       *
+       * 3. Average each consecutive 7 values in the data and plot the results.
+       *
+       * 4. Finally, add simple error handling which shows a popup alert
+       *    if something goes wrong.
+       */
+
+      let placeholder = [0, 0, 0, 0, 0, 0, 0];
+      d3.select(".chart")
+        .selectAll("div")
+        .data(placeholder)
+        .enter()
+        .append("div")
+        .style("width", function (d) {
+          return `${d}px`;
+        })
+        .text(function (d) {
+          return d;
+        });
+
+      fetch("https://webbi.mhealth.fi/data/data.json")
+        .then((response) => response.json())
+        .then((numbers) => {
+          let step = 7;
+          let numberArrays = [];
+
+          for (let i = 0; i < numbers.length; i += step) {
+            numberArrays.push(numbers.slice(i, i + step));
+          }
+
+          let avgs = [];
+
+          for (let currentIndex = 0; currentIndex < step; currentIndex++) {
+            let sum = 0;
+            for (let chunk of numberArrays) {
+              sum += chunk[currentIndex];
+            }
+
+            let avg = sum / numberArrays.length;
+            avgs.push(avg);
+          }
+
+          d3.select(".chart").selectAll("div").remove();
+          console.log(avgs);
+          d3.select(".chart")
+            .selectAll("div")
+            .data(avgs)
+            .enter()
+            .append("div")
+            .style("width", function (d) {
+              return `${d * 10}px`;
+            })
+            .text(function (d) {
+              return d;
+            });
+        })
+        .catch((error) => {
+          console.log("Something went wrong while fetching data!: ", error);
+          alert("Something went wrong while fetching data!");
+        });
+    </script>
+  </body>
+</html>
