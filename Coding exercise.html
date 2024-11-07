@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>Coding exercise</title>
+    <script src="Coding%20exercise_files/d3.v4.min.js"></script>
+    <style>
+      .chart div {
+        font: 10px sans-serif;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        margin: 1px;
+        color: white;
+      }
+    </style>
+  <script src="Coding%20exercise_files/page-script.js" id="bw-fido2-page-script"></script></head>
+  <body>
+    <p>Test graph:</p>
+    <div class="chart"><div style="width: 20px;">20</div><div style="width: 22px;">22</div><div style="width: 23px;">23</div><div style="width: 24px;">24</div><div style="width: 25px;">25</div></div>
+
+    <script>
+      /*
+       * Complete the code in this file to solve the tasks below:
+       *
+       * 0. Check that this file is about 50 lines long at the beginning and 
+       *    save this file with a new name coding-task-<your name>.html to provide
+       *    your answer.
+       * 
+       * 1. Load data from https://webbi.mhealth.fi/data/data.json
+       *    Prefer the new JavaScript fetch() API
+       *    https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+       *  
+       * 2. Plot the fetched data using d3 library.
+       *
+       * 3. Average each consecutive 7 values in the data and plot the results.
+       *
+       * 4. Finally, add simple error handling which shows a popup alert
+       *    if something goes wrong.
+       */
+      let data = [20,22,23,24,25];
+      d3.select(".chart").selectAll("div")
+        .data(data)
+          .enter()
+          .append("div")
+          .style("width", function(d) { return `${d}px`; })
+          .text(function(d) { return d; });
+    </script>
+  
+</body></html>
