@@ -50,7 +50,7 @@
        *    if something goes wrong.
        */
 
-      let placeholder = [0, 0, 0, 0, 0, 0, 0];
+      let placeholder = [0, 0, 0, 0];
       d3.select(".chart")
         .selectAll("div")
         .data(placeholder)
@@ -67,22 +67,13 @@
         .then((response) => response.json())
         .then((numbers) => {
           let step = 7;
-          let numberArrays = [];
-
-          for (let i = 0; i < numbers.length; i += step) {
-            numberArrays.push(numbers.slice(i, i + step));
-          }
-
           let avgs = [];
 
-          for (let currentIndex = 0; currentIndex < step; currentIndex++) {
-            let sum = 0;
-            for (let chunk of numberArrays) {
-              sum += chunk[currentIndex];
-            }
-
-            let avg = sum / numberArrays.length;
-            avgs.push(avg);
+          for (let i = 0; i < numbers.length; i += step) {
+            let sum = numbers.slice(i, i + step).reduce((res, n) => {
+              return res + n;
+            }, 0);
+            avgs.push((sum / step).toFixed(2));
           }
 
           d3.select(".chart").selectAll("div").remove();
