@@ -10,7 +10,7 @@
       id="bw-fido2-page-script"
     ></script>
     <style>
-      .chart div {
+      .avg-chart div {
         font: 10px sans-serif;
         background-color: steelblue;
         text-align: right;
@@ -21,14 +21,10 @@
     </style>
   </head>
   <body>
+    <p></p>
+    <div class="line-chart"></div>
     <p>Averages graph:</p>
-    <div class="chart">
-      <!-- <div style="width: 20px">0</div>
-      <div style="width: 22px">0</div>
-      <div style="width: 23px">0</div>
-      <div style="width: 24px">0</div>
-      <div style="width: 25px">0</div> -->
-    </div>
+    <div class="avg-chart"></div>
 
     <script>
       /*
@@ -50,8 +46,10 @@
        *    if something goes wrong.
        */
 
+      // placeholder vals
+
       let placeholder = [0, 0, 0, 0];
-      d3.select(".chart")
+      d3.select(".avg-chart")
         .selectAll("div")
         .data(placeholder)
         .enter()
@@ -63,10 +61,73 @@
           return d;
         });
 
+      // get and process data
+
+      let step = 7;
+
       fetch("https://webbi.mhealth.fi/data/data.json")
         .then((response) => response.json())
         .then((numbers) => {
-          let step = 7;
+          // plot the numbers in a line chart
+          let width = 800;
+          let height = 600;
+          let margin = { top: 20, right: 30, bottom: 30, left: 40 };
+
+          let svg = d3
+            .select(".line-chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+          let x = d3
+            .scaleLinear()
+            .domain([1, 7])
+            .range([0, width - margin.left - margin.right]);
+
+          let y = d3
+            .scaleLinear()
+            .domain([0, d3.max(numbers.flat())])
+            .range([height - margin.top - margin.bottom, 0]);
+
+          let line = d3
+            .line()
+            .x((d, i) => x(i + 1)) // (index + 1)
+            .y((d) => y(d));
+
+          // let colors = d3.schemeCategory10;
+
+          let sets = [];
+          for (let i = 0; i < numbers.length; i += step) {
+            sets.push(numbers.slice(i, i + step));
+          }
+
+          console.log(sets);
+          let colors = ["red", "orange", "blue", "purple"];
+          let lineStyles = ["4,4", "16,16", "4,4", "8,8"];
+          sets.forEach((dataset, index) => {
+            svg
+              .append("path")
+              .datum(dataset)
+              .attr("fill", "none")
+              .attr("stroke", colors[index % colors.length])
+              .attr("stroke-dasharray", lineStyles[index % lineStyles.length])
+              .attr("stroke-width", 2)
+              .attr("d", line);
+          });
+
+          svg
+            .append("g")
+            .attr(
+              "transform",
+              `translate(0,${height - margin.top - margin.bottom})`
+            )
+            .call(d3.axisBottom(x).ticks(7));
+
+          svg.append("g").call(d3.axisLeft(y));
+
+          // plot averages
           let avgs = [];
 
           for (let i = 0; i < numbers.length; i += step) {
@@ -76,9 +137,9 @@
             avgs.push((sum / step).toFixed(2));
           }
 
-          d3.select(".chart").selectAll("div").remove();
+          d3.select(".avg-chart").selectAll("div").remove();
           console.log(avgs);
-          d3.select(".chart")
+          d3.select(".avg-chart")
             .selectAll("div")
             .data(avgs)
             .enter()
